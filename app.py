@@ -53,19 +53,24 @@ latex_input = st.text_area(
     placeholder=placeholder_text,
 )
 
-filename = st.text_input("File name (without .pdf)", value="derivation")
+filename = st.text_input("File name (without extension)", value="derivation")
 
-convert_clicked = st.button("Convert to PDF", type="primary", use_container_width=True)
+col1, col2 = st.columns(2)
+with col1:
+    convert_pdf_clicked = st.button("Convert to PDF", type="primary", use_container_width=True)
+with col2:
+    convert_word_clicked = st.button("Convert to Word (.docx)", use_container_width=True)
 
-if convert_clicked:
+def build_full_tex():
+    if mode.startswith("Just the content"):
+        return DEFAULT_PREAMBLE + "\n" + latex_input + "\n" + DEFAULT_ENDING
+    return latex_input
+
+if convert_pdf_clicked:
     if not latex_input.strip():
         st.warning("Please paste some LaTeX content first.")
     else:
-        if mode.startswith("Just the content"):
-            full_tex = DEFAULT_PREAMBLE + "\n" + latex_input + "\n" + DEFAULT_ENDING
-        else:
-            full_tex = latex_input
-
+        full_tex = build_full_tex()
         with st.spinner("Compiling your PDF..."):
             with tempfile.TemporaryDirectory() as tmpdir:
                 tex_path = os.path.join(tmpdir, "document.tex")
@@ -110,8 +115,52 @@ if convert_clicked:
                     with st.expander("Show compilation log"):
                         st.code(log_output, language="text")
 
+if convert_word_clicked:
+    if not latex_input.strip():
+        st.warning("Please paste some LaTeX content first.")
+    else:
+        full_tex = build_full_tex()
+        with st.spinner("Converting to Word..."):
+            with tempfile.TemporaryDirectory() as tmpdir:
+                tex_path = os.path.join(tmpdir, "document.tex")
+                docx_path = os.path.join(tmpdir, "document.docx")
+                with open(tex_path, "w", encoding="utf-8") as f:
+                    f.write(full_tex)
+
+                result = subprocess.run(
+                    ["pandoc", "document.tex", "-o", "document.docx", "--from=latex", "--to=docx"],
+                    cwd=tmpdir,
+                    capture_output=True,
+                    text=True,
+                    timeout=60,
+                )
+
+                if result.returncode == 0 and os.path.exists(docx_path):
+                    with open(docx_path, "rb") as f:
+                        docx_bytes = f.read()
+                    st.success("Your Word document is ready.")
+                    st.caption(
+                        "Math equations convert into real, editable Word equations — not images. "
+                        "Note: equation numbers (like \\tag{22}) don't carry over to Word and would "
+                        "need to be added manually if you need them."
+                    )
+                    st.download_button(
+                        "⬇️ Download Word (.docx)",
+                        data=docx_bytes,
+                        file_name=f"{filename or 'document'}.docx",
+                        mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        use_container_width=True,
+                    )
+                else:
+                    st.error(
+                        "The conversion to Word failed. Check the log below for details."
+                    )
+                    with st.expander("Show conversion log"):
+                        st.code(result.stdout + result.stderr, language="text")
+
 st.divider()
 st.caption(
     "Tip: if you're not sure your LaTeX is valid, ask the AI assistant that generated it "
     "to double-check the syntax before pasting it here."
 )
+
