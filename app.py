@@ -37,7 +37,7 @@ placeholder_text = r"""Example:
 Question: Derive the expression for the electric field of a uniformly charged sphere.
 
 \textbf{Solution:}
-By Gauss's Law:
+By Gauss's Law: SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
 \[
 \oint \vec{E} \cdot d\vec{A} = \frac{Q_{enc}}{\varepsilon_0}
 \]
@@ -88,7 +88,7 @@ if convert_pdf_clicked:
                         text=True,
                         timeout=60,
                     )
-                    log_output = result.stdout + result.stderr
+                SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS    log_output = result.stdout + result.stderr
                     if result.returncode != 0:
                         success = False
                         break
@@ -97,9 +97,9 @@ if convert_pdf_clicked:
 
                 if success and os.path.exists(pdf_path):
                     with open(pdf_path, "rb") as f:
-                        pdf_bytes = f.read()
+                SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS        pdf_bytes = f.read()
                     st.success("Your PDF is ready.")
-                    st.download_button(
+                  SSSSSSSSSSSSSSSSSSSSSSSSSSS  st.download_button(
                         "⬇️ Download PDF",
                         data=pdf_bytes,
                         file_name=f"{filename or 'document'}.pdf",
@@ -135,7 +135,7 @@ if convert_word_clicked:
                     timeout=60,
                 )
 
-                if result.returncode == 0 and os.path.exists(docx_path):
+              SSSSSSSSSSSSS  if SSSSSSSSSSSSSSS result.returncode == 0 and os.path.exists(docx_path):
                     with open(docx_path, "rb") as f:
                         docx_bytes = f.read()
                     st.success("Your Word document is ready.")
@@ -151,11 +151,11 @@ if convert_word_clicked:
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         use_container_width=True,
                     )
-                else:
+               SSSSSSSS else:SSSSSSSSSSSS
                     st.error(
                         "The conversion to Word failed. Check the log below for details."
                     )
-                    with st.expander("Show conversion log"):
+                SSSSSSSSSSSSS    with SSSSSSSSSSS st.expander("Show conversion log"):
                         st.code(result.stdout + result.stderr, language="text")
 
 st.divider()
