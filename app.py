@@ -12,7 +12,6 @@ st.write(
     "downloadable PDF — no more broken equations when pasting into Word."
 )
 
-# A ready-made template so the physics symbols, fractions, and derivations render correctly.
 DEFAULT_PREAMBLE = r"""
 \documentclass[12pt]{article}
 \usepackage[margin=1in]{geometry}
@@ -37,7 +36,7 @@ placeholder_text = r"""Example:
 Question: Derive the expression for the electric field of a uniformly charged sphere.
 
 \textbf{Solution:}
-By Gauss's Law: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+By Gauss's Law:
 \[
 \oint \vec{E} \cdot d\vec{A} = \frac{Q_{enc}}{\varepsilon_0}
 \]
@@ -61,10 +60,12 @@ with col1:
 with col2:
     convert_word_clicked = st.button("Convert to Word (.docx)", use_container_width=True)
 
+
 def build_full_tex():
     if mode.startswith("Just the content"):
         return DEFAULT_PREAMBLE + "\n" + latex_input + "\n" + DEFAULT_ENDING
     return latex_input
+
 
 if convert_pdf_clicked:
     if not latex_input.strip():
@@ -77,7 +78,7 @@ if convert_pdf_clicked:
                 with open(tex_path, "w", encoding="utf-8") as f:
                     f.write(full_tex)
 
-                # Run pdflatex twice — the second pass correctly resolves numbering/references.
+                # Run pdflatex twice — the second pass resolves numbering/references.
                 log_output = ""
                 success = True
                 for _ in range(2):
@@ -88,7 +89,7 @@ if convert_pdf_clicked:
                         text=True,
                         timeout=60,
                     )
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!    log_output = result.stdout + result.stderr
+                    log_output = result.stdout + result.stderr
                     if result.returncode != 0:
                         success = False
                         break
@@ -97,9 +98,9 @@ if convert_pdf_clicked:
 
                 if success and os.path.exists(pdf_path):
                     with open(pdf_path, "rb") as f:
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!        pdf_bytes = f.read()
+                        pdf_bytes = f.read()
                     st.success("Your PDF is ready.")
-                  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  st.download_button(
+                    st.download_button(
                         "⬇️ Download PDF",
                         data=pdf_bytes,
                         file_name=f"{filename or 'document'}.pdf",
@@ -114,6 +115,7 @@ if convert_pdf_clicked:
                     )
                     with st.expander("Show compilation log"):
                         st.code(log_output, language="text")
+
 
 if convert_word_clicked:
     if not latex_input.strip():
@@ -135,7 +137,7 @@ if convert_word_clicked:
                     timeout=60,
                 )
 
-            !!!!!!!!!!!!!!!!!!!!!!!!!!  if !!!!!!!!!!!!!!!!!!!!!!!!!!!!!! result.returncode == 0 and os.path.exists(docx_path):
+                if result.returncode == 0 and os.path.exists(docx_path):
                     with open(docx_path, "rb") as f:
                         docx_bytes = f.read()
                     st.success("Your Word document is ready.")
@@ -151,13 +153,12 @@ if convert_word_clicked:
                         mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                         use_container_width=True,
                     )
-               !!!!!!!!!!!!!!!!!!!!! else:!!!!!!!!!!!!!!!!!!!!11
+                else:
                     st.error(
                         "The conversion to Word failed. Check the log below for details."
                     )
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!   with!!!!!!!!!!!!!!!!!!! 1st.expander("Show conversion log"):
+                    with st.expander("Show conversion log"):
                         st.code(result.stdout + result.stderr, language="text")
-
 st.divider()
 st.caption(
     "Tip: if you're not sure your LaTeX is valid, ask the AI assistant that generated it "
