@@ -1,5 +1,2 @@
 texlive-latex-base
-texlive-latex-extra
-texlive-fonts-recommended
-texlive-science
-pandoc
+
